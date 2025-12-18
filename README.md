@@ -29,8 +29,8 @@ A Django-based learning portal that simulates a project management environment w
 2. **Configure Environment Variables**
    Create a `.env` file in the project root:
    ```
-   SECRET_KEY=your-secret-key-here
-   OPENAI_API_KEY=your-openai-api-key-here
+   SECRET_KEY="i8laj*j^%vn@vp0=e6=(#lis12wu^y1risbj)f&m)%g^hvaz3%"
+   OPENAI_API_KEY="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"
    DEBUG=True
    ```
 
@@ -50,14 +50,22 @@ A Django-based learning portal that simulates a project management environment w
    ```
 
 6. **Run Development Server**
+   
+   **Easy way (recommended):**
+   - Double-click `start_server.bat` (Windows)
+   - Or run `start_server.ps1` in PowerShell
+   
+   **Manual way:**
    ```bash
    python manage.py runserver
    ```
-
-   For WebSocket support, use Daphne:
+   
+   For WebSocket support (required for chat), use Daphne:
    ```bash
-   daphne -b 0.0.0.0 -p 8000 config.asgi:application
+   daphne -b 127.0.0.1 -p 8000 config.asgi:application
    ```
+   
+   Or simply use the provided startup scripts which use Daphne automatically.
 
 ## Usage Flow
 

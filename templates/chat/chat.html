@@ -84,9 +84,16 @@
 
 <script>
     const stakeholderId = {{ stakeholder.id }};
-    const chatSocket = new WebSocket(
-        'ws://' + window.location.host + '/ws/chat/' + stakeholderId + '/'
-    );
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = wsProtocol + '//' + window.location.host + '/ws/chat/' + stakeholderId + '/';
+    
+    console.log('Attempting WebSocket connection to:', wsUrl);
+    
+    const chatSocket = new WebSocket(wsUrl);
+
+    chatSocket.onopen = function(e) {
+        console.log('WebSocket connection opened successfully');
+    };
 
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
@@ -116,8 +123,29 @@
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     };
 
+    chatSocket.onerror = function(error) {
+        console.error('WebSocket error details:');
+        console.error('  Error object:', error);
+        console.error('  WebSocket URL:', wsUrl);
+        console.error('  WebSocket readyState:', chatSocket.readyState);
+        console.error('  WebSocket protocol:', chatSocket.protocol);
+        console.error('  WebSocket extensions:', chatSocket.extensions);
+        
+        // Show user-friendly error
+        const messagesDiv = document.getElementById('chat-messages');
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger';
+        errorDiv.innerHTML = '<strong>Connection Error:</strong> Unable to connect to chat server. Please refresh the page and try again.';
+        messagesDiv.appendChild(errorDiv);
+    };
+
     chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
+        console.error('Chat socket closed. Code:', e.code, 'Reason:', e.reason, 'WasClean:', e.wasClean);
+        if (e.code === 4001) {
+            alert('Authentication failed. Please log in again.');
+        } else if (e.code !== 1000) {
+            console.error('Unexpected WebSocket closure');
+        }
     };
 
     document.querySelector('#message-form').onsubmit = function(e) {
