@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Virtual Office - Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stakeholder-card {
+        transition: transform 0.2s;
+        cursor: pointer;
+    }
+    .stakeholder-card:hover {
+        transform: translateY(-5px);
+    }
+    .online-indicator {
+        width: 12px;
+        height: 12px;
+        background-color: #28a745;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-bell"></i> Notifications</h5>
+            </div>
+            <div class="card-body">
+                {% if notifications %}
+                    <div id="notifications-list">
+                        {% for notification in notifications %}
+                            <div class="alert alert-info alert-dismissible fade show mb-2" role="alert">
+                                <strong>{{ notification.title }}</strong><br>
+                                <small>{{ notification.message }}</small>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No new notifications</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-folder"></i> My Projects</h5>
+            </div>
+            <div class="card-body">
+                {% if projects %}
+                    <ul class="list-group list-group-flush">
+                        {% for project in projects %}
+                            <li class="list-group-item">{{ project.name }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No projects yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h3 class="mb-0"><i class="bi bi-people"></i> Virtual Office - Online Stakeholders</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for stakeholder in stakeholders %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card stakeholder-card" onclick="window.location.href='{% url 'chat:chat_room' stakeholder.id %}'">
+                                <div class="card-body text-center">
+                                    <div class="mb-2">
+                                        <span style="font-size: 3em;">{{ stakeholder.avatar|default:"👤" }}</span>
+                                    </div>
+                                    <h5 class="card-title">{{ stakeholder.name }}</h5>
+                                    <p class="card-text">
+                                        <span class="online-indicator"></span>
+                                        <small class="text-muted">{{ stakeholder.get_stakeholder_type_display }}</small>
+                                    </p>
+                                    {% if stakeholder.description %}
+                                        <p class="card-text"><small>{{ stakeholder.description }}</small></p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="col-12">
+                            <p class="text-center text-muted">No stakeholders online at the moment.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat - Stakeholders{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="bi bi-chat-dots"></i> Available Stakeholders</h2>
+        <div class="row mt-4">
+            {% for stakeholder in stakeholders %}
+                <div class="col-md-3 mb-3">
+                    <div class="card stakeholder-card" onclick="window.location.href='{% url 'chat:chat_room' stakeholder.id %}'">
+                        <div class="card-body text-center">
+                            <div class="mb-2">
+                                <span style="font-size: 3em;">{{ stakeholder.avatar|default:"👤" }}</span>
+                            </div>
+                            <h5 class="card-title">{{ stakeholder.name }}</h5>
+                            <p class="card-text">
+                                <span class="badge bg-success">Online</span>
+                                <br>
+                                <small class="text-muted">{{ stakeholder.get_stakeholder_type_display }}</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <p class="text-center text-muted">No stakeholders available.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
