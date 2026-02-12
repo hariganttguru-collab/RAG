@@ -1,0 +1,60 @@
+name: Deploy RAG to Azure Web App
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'RAG/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Remove virtual env if present
+        run: rm -rf .venv venv env antenv
+        continue-on-error: true
+
+      - name: Set project root for RAG
+        id: project
+        run: |
+          if [ -f RAG/manage.py ] && [ -f RAG/requirements.txt ]; then
+            echo "root=RAG" >> $GITHUB_OUTPUT
+          elif [ -f manage.py ] && [ -f requirements.txt ]; then
+            echo "root=." >> $GITHUB_OUTPUT
+          else
+            echo "Could not find RAG project (manage.py + requirements.txt)"
+            exit 1
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          cd ${{ steps.project.outputs.root }}
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Collect static files
+        run: |
+          cd ${{ steps.project.outputs.root }}
+          python manage.py collectstatic --noinput
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ steps.project.outputs.root }}
