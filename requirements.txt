@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 Django==4.2.7
 channels==4.0.0
 channels-redis==4.1.0
@@ -9,17 +8,5 @@ openai>=1.0.0
 python-dotenv==1.0.0
 Pillow==10.1.0
 redis==5.0.1
-
-=======
-Django==4.2.7
-channels==4.0.0
-channels-redis==4.1.0
-daphne==4.0.0
-langchain==0.1.0
-langchain-openai==0.0.2
-openai>=1.0.0
-python-dotenv==1.0.0
-Pillow==10.1.0
-redis==5.0.1
-
->>>>>>> 58d64fddec4673e0a29d46ffd423ba18536a63a1
+gunicorn==21.2.0
+whitenoise==6.6.0
